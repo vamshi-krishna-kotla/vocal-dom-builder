@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            border: 1px solid black;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            display: flex;
+            width: 90%;
+        }
+
+        .current {
+            border: 5px solid red;
+        }
+    </style>
+    <script>
+        window.onload = () => {
+            let targetParent, currentTarget, elementStack = [{ element: document.body, siblingsCount: 1, siblingIndex: 0 }];
+
+            document.addEventListener('keypress', (event) => {
+                let operation;
+
+                switch (event.key) {
+                    case 'w':
+                        operation = 'top';
+                        break;
+                    case 'a':
+                        operation = 'left';
+                        break;
+                    case 's':
+                        operation = 'bottom';
+                        break;
+                    case 'd':
+                        operation = 'right';
+                        break;
+                    case 'Enter':
+                        operation = 'addChild';
+                        break;
+                    default:
+                        break;
+                }
+
+                if (operation === 'top') {
+                    if (elementStack.length - 1) {
+                        currentTarget = elementStack.pop();
+                        currentTarget.element.classList.remove('current');
+                        currentTarget = elementStack[elementStack.length - 1];
+                        currentTarget.element.classList.add('current');
+                    }
+                } else if (operation === 'left') {
+                    if (elementStack.length - 1) {
+                        currentTarget = elementStack[elementStack.length - 1];
+
+                        if (currentTarget.siblingsCount > 1 && currentTarget.siblingIndex > 0) {
+                            currentTarget.element.classList.remove('current');
+                            currentTarget.element = elementStack[elementStack.length - 2].element.children[currentTarget.siblingIndex - 1];
+                            currentTarget.siblingIndex--;
+                            currentTarget.element.classList.add('current');
+                        }
+                    }
+                } else if (operation === 'right') {
+                    if (elementStack.length - 1) {
+                        currentTarget = elementStack[elementStack.length - 1];
+
+                        if (currentTarget.siblingsCount > 1 && currentTarget.siblingIndex < currentTarget.siblingsCount - 1) {
+                            currentTarget.element.classList.remove('current');
+                            currentTarget.element = elementStack[elementStack.length - 2].element.children[currentTarget.siblingIndex + 1];
+                            currentTarget.siblingIndex++;
+                            currentTarget.element.classList.add('current');
+                        }
+                    }
+                } else if (operation === 'bottom') {
+                    currentTarget = elementStack[elementStack.length - 1];
+
+                    if (currentTarget.element.children.length) {
+                        siblingsCount = currentTarget.element.children.length;
+                        currentTarget.element.classList.remove('current');
+                        currentTarget = { element: currentTarget.element.children[0], siblingsCount, siblingIndex: 0 };
+                        elementStack.push(currentTarget);
+                        currentTarget.element.classList.add('current');
+                    }
+                } else if (operation === 'addChild') {
+                    currentTarget = elementStack[elementStack.length - 1];
+                    currentTarget.element.insertAdjacentHTML('beforeend', '<div></div>');
+                }
+            });
+        };
+    </script>
+</head>
+
+<body class="current">
+    <div>
+        <div>
+            <div></div>
+            <div></div>
+        </div>
+        <div></div>
+        <div></div>
+    </div>
+</body>
+
+</html>
